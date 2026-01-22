@@ -33,9 +33,7 @@ export function Sidebar() {
         <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary text-primary-foreground">
           <FileText className="h-4 w-4" />
         </div>
-        <span className="text-lg font-semibold">
-          {locale === 'zh' ? '发票管理' : 'Invoices'}
-        </span>
+        <span className="text-lg font-semibold">SollAI</span>
       </div>
 
       {/* Navigation */}
