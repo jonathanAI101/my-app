@@ -1,156 +1,115 @@
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Button } from "@/components/ui/button";
-import { Card } from "@/components/ui/card";
-import { Separator } from "@/components/ui/separator";
+'use client';
+
+import Link from 'next/link';
+import { useInvoiceStore } from '@/store/invoiceStore';
+import { StatsCard } from '@/components/invoice/StatsCard';
+import { InvoiceTable } from '@/components/invoice/InvoiceTable';
+import { Button } from '@/components/ui/button';
+import { Card } from '@/components/ui/card';
+import { formatCurrency } from '@/utils/format';
 import {
-  Github,
-  Twitter,
-  Mail,
-  Linkedin,
-  Phone,
-  MapPin,
-  MessageCircle,
-  ArrowUpRight,
-} from "lucide-react";
+  DollarSign,
+  Clock,
+  AlertTriangle,
+  FileText,
+  Plus,
+  ArrowRight,
+} from 'lucide-react';
 
-const socialLinks = [
-  { icon: Github, href: "https://github.com", label: "GitHub" },
-  { icon: Twitter, href: "https://twitter.com", label: "Twitter" },
-  { icon: Linkedin, href: "https://linkedin.com", label: "LinkedIn" },
-  { icon: Mail, href: "mailto:hello@example.com", label: "Email" },
-];
+export default function DashboardPage() {
+  const { invoices, stats, updateStatus, deleteInvoice } = useInvoiceStore();
+  const invoiceStats = stats();
+  const recentInvoices = invoices.slice(0, 5);
+  const overdueInvoices = invoices.filter((inv) => inv.status === 'overdue');
 
-const contactInfo = [
-  { icon: Phone, value: "+86 138 0000 0000", label: "Phone" },
-  { icon: MessageCircle, value: "johndoe", label: "WeChat" },
-  { icon: MapPin, value: "Shanghai, China", label: "Location" },
-];
-
-export default function Home() {
   return (
-    <div className="min-h-screen bg-gradient-to-b from-background to-muted/20 px-4 py-16 sm:px-6 lg:px-8">
-      <main className="mx-auto max-w-2xl">
-        {/* Header Section */}
-        <div className="flex flex-col items-center sm:flex-row sm:items-start sm:gap-8">
-          <Avatar className="h-32 w-32 shrink-0 border-4 border-background shadow-xl transition-transform duration-300 hover:scale-105">
-            <AvatarImage src="/avatar.jpg" alt="John Doe" />
-            <AvatarFallback className="bg-primary/10 text-3xl font-semibold text-primary">
-              JD
-            </AvatarFallback>
-          </Avatar>
+    <div className="p-8">
+      {/* Header */}
+      <div className="mb-8 flex items-center justify-between">
+        <div>
+          <h1 className="text-2xl font-bold tracking-tight">仪表盘</h1>
+          <p className="text-muted-foreground">欢迎回来，这是您的发票概览</p>
+        </div>
+        <Button asChild>
+          <Link href="/invoices/new">
+            <Plus className="mr-2 h-4 w-4" />
+            新建发票
+          </Link>
+        </Button>
+      </div>
 
-          <div className="mt-6 text-center sm:mt-0 sm:text-left">
-            <h1 className="text-3xl font-bold tracking-tight text-foreground sm:text-4xl">
-              John Doe
-            </h1>
-            <p className="mt-2 text-lg font-medium text-primary">
-              Full-Stack Developer
-            </p>
-            <p className="mt-4 max-w-md text-muted-foreground leading-relaxed">
-              Building digital products with a focus on clean code and
-              thoughtful design. Currently crafting experiences at Acme Inc.
-            </p>
+      {/* Stats Grid */}
+      <div className="mb-8 grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+        <StatsCard
+          title="总收入"
+          value={formatCurrency(invoiceStats.totalRevenue)}
+          description={`${invoiceStats.paidCount} 张已付款`}
+          icon={DollarSign}
+          iconColor="text-green-600"
+        />
+        <StatsCard
+          title="待收款"
+          value={formatCurrency(invoiceStats.pendingAmount)}
+          description="等待客户付款"
+          icon={Clock}
+          iconColor="text-blue-600"
+        />
+        <StatsCard
+          title="逾期款项"
+          value={formatCurrency(invoiceStats.overdueAmount)}
+          description={`${invoiceStats.overdueCount} 张已逾期`}
+          icon={AlertTriangle}
+          iconColor="text-red-600"
+        />
+        <StatsCard
+          title="发票总数"
+          value={String(invoiceStats.invoiceCount)}
+          description="所有发票"
+          icon={FileText}
+          iconColor="text-gray-600"
+        />
+      </div>
 
-            {/* Social Links - Desktop */}
-            <div className="mt-6 hidden gap-1 sm:flex">
-              {socialLinks.map(({ icon: Icon, href, label }) => (
-                <Button
-                  key={label}
-                  variant="ghost"
-                  size="icon"
-                  className="text-muted-foreground transition-colors hover:text-foreground"
-                  asChild
-                >
-                  <a
-                    href={href}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    aria-label={label}
-                  >
-                    <Icon className="h-5 w-5" />
-                  </a>
-                </Button>
-              ))}
+      {/* Overdue Alert */}
+      {overdueInvoices.length > 0 && (
+        <Card className="mb-8 border-red-200 bg-red-50 p-4">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-3">
+              <div className="rounded-full bg-red-100 p-2">
+                <AlertTriangle className="h-5 w-5 text-red-600" />
+              </div>
+              <div>
+                <h3 className="font-semibold text-red-900">逾期提醒</h3>
+                <p className="text-sm text-red-700">
+                  您有 {overdueInvoices.length} 张发票已逾期，总金额{' '}
+                  {formatCurrency(invoiceStats.overdueAmount)}
+                </p>
+              </div>
             </div>
-          </div>
-        </div>
-
-        {/* Social Links - Mobile */}
-        <div className="mt-6 flex justify-center gap-1 sm:hidden">
-          {socialLinks.map(({ icon: Icon, href, label }) => (
-            <Button
-              key={label}
-              variant="ghost"
-              size="icon"
-              className="text-muted-foreground transition-colors hover:text-foreground"
-              asChild
-            >
-              <a
-                href={href}
-                target="_blank"
-                rel="noopener noreferrer"
-                aria-label={label}
-              >
-                <Icon className="h-5 w-5" />
-              </a>
+            <Button variant="destructive" size="sm" asChild>
+              <Link href="/invoices?status=overdue">立即处理</Link>
             </Button>
-          ))}
-        </div>
-
-        <Separator className="my-10" />
-
-        {/* Contact Section */}
-        <section>
-          <h2 className="text-sm font-semibold uppercase tracking-wider text-muted-foreground">
-            Contact
-          </h2>
-          <div className="mt-4 grid gap-3 sm:grid-cols-3">
-            {contactInfo.map(({ icon: Icon, value, label }) => (
-              <Card
-                key={label}
-                className="group cursor-default p-4 transition-all duration-200 hover:bg-muted/50 hover:shadow-md"
-              >
-                <div className="flex items-center gap-3">
-                  <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-primary/10 text-primary transition-colors group-hover:bg-primary/20">
-                    <Icon className="h-5 w-5" />
-                  </div>
-                  <div className="min-w-0">
-                    <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
-                      {label}
-                    </p>
-                    <p className="truncate text-sm font-medium text-foreground">
-                      {value}
-                    </p>
-                  </div>
-                </div>
-              </Card>
-            ))}
           </div>
-        </section>
+        </Card>
+      )}
 
-        <Separator className="my-10" />
-
-        {/* CTA Section */}
-        <section className="text-center">
-          <h2 className="text-xl font-semibold text-foreground">
-            Let&apos;s work together
-          </h2>
-          <p className="mt-2 text-muted-foreground">
-            Have a project in mind? I&apos;d love to hear about it.
-          </p>
-          <Button size="lg" className="mt-6 gap-2" asChild>
-            <a href="mailto:hello@example.com">
-              Get in Touch
-              <ArrowUpRight className="h-4 w-4" />
-            </a>
+      {/* Recent Invoices */}
+      <div className="space-y-4">
+        <div className="flex items-center justify-between">
+          <h2 className="text-lg font-semibold">最近发票</h2>
+          <Button variant="ghost" size="sm" asChild>
+            <Link href="/invoices">
+              查看全部
+              <ArrowRight className="ml-1 h-4 w-4" />
+            </Link>
           </Button>
-        </section>
-
-        {/* Footer */}
-        <footer className="mt-16 text-center text-sm text-muted-foreground">
-          <p>&copy; {new Date().getFullYear()} John Doe. All rights reserved.</p>
-        </footer>
-      </main>
+        </div>
+        <InvoiceTable
+          invoices={recentInvoices}
+          onDelete={deleteInvoice}
+          onStatusChange={updateStatus}
+        />
+      </div>
     </div>
   );
 }
