@@ -1,9 +1,13 @@
 'use client';
 
 import { create } from 'zustand';
+import { persist, createJSONStorage } from 'zustand/middleware';
 import type { Invoice, InvoiceStatus, InvoiceFilters, InvoiceStats } from '@/types/invoice';
-import { mockInvoices, getInvoiceStats } from '@/data/mockInvoices';
+import { mockInvoices } from '@/data/mockInvoices';
 import { generateId, generateInvoiceNumber, calculateSubtotal, calculateTax, calculateTotal } from '@/utils/format';
+
+// 存储版本号，用于数据迁移
+const STORAGE_VERSION = 1;
 
 interface InvoiceStore {
   // 数据
@@ -23,12 +27,14 @@ interface InvoiceStore {
   updateStatus: (id: string, status: InvoiceStatus) => void;
 }
 
-export const useInvoiceStore = create<InvoiceStore>((set, get) => ({
-  invoices: mockInvoices,
-  filters: {
-    status: 'all',
-    search: '',
-  },
+export const useInvoiceStore = create<InvoiceStore>()(
+  persist(
+    (set, get) => ({
+      invoices: mockInvoices,
+      filters: {
+        status: 'all',
+        search: '',
+      },
 
   filteredInvoices: () => {
     const { invoices, filters } = get();
@@ -167,4 +173,27 @@ export const useInvoiceStore = create<InvoiceStore>((set, get) => ({
       }),
     }));
   },
-}));
+    }),
+    {
+      name: 'invoice-storage',
+      storage: createJSONStorage(() => localStorage),
+      version: STORAGE_VERSION,
+      partialize: (state) => ({
+        // 只持久化数据，不持久化计算函数和临时状态
+        invoices: state.invoices,
+      }),
+      migrate: (persistedState: unknown, version: number) => {
+        // 数据迁移逻辑
+        if (version === 0) {
+          // 从版本 0 迁移到版本 1
+          return persistedState;
+        }
+        return persistedState;
+      },
+      onRehydrateStorage: () => (state) => {
+        // 水合完成后的回调
+        console.log('Invoice store hydrated');
+      },
+    }
+  )
+);
