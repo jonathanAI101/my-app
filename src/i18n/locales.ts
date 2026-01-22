@@ -161,6 +161,12 @@ export const locales = {
       importError: '导入失败',
     },
 
+    // Preview
+    preview: {
+      title: '预览',
+      quickPreview: '快速预览',
+    },
+
     // Language
     language: {
       zh: '中文',
@@ -329,6 +335,12 @@ export const locales = {
       invoicesImported: 'invoices imported',
       skipped: 'duplicates skipped',
       importError: 'Import failed',
+    },
+
+    // Preview
+    preview: {
+      title: 'Preview',
+      quickPreview: 'Quick Preview',
     },
 
     // Language

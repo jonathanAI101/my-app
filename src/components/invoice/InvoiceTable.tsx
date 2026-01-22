@@ -18,11 +18,12 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import { InvoiceStatusBadge } from './InvoiceStatusBadge';
+import { InvoicePreview } from './InvoicePreview';
 import { useI18n } from '@/i18n';
 import { useTableConfigStore, COLUMN_IDS } from '@/store/tableConfigStore';
 import { formatCurrency, formatDate } from '@/utils/format';
 import type { Invoice } from '@/types/invoice';
-import { MoreHorizontal, Eye, Pencil, Trash2, CheckCircle, XCircle } from 'lucide-react';
+import { MoreHorizontal, Eye, Pencil, Trash2, CheckCircle, XCircle, FileSearch } from 'lucide-react';
 
 interface InvoiceTableProps {
   invoices: Invoice[];
@@ -125,24 +126,40 @@ export function InvoiceTable({ invoices, onDelete, onStatusChange }: InvoiceTabl
                 )}
                 {isColumnVisible(COLUMN_IDS.ACTIONS) && (
                   <TableCell>
-                    <DropdownMenu>
-                      <DropdownMenuTrigger asChild>
-                        <Button
-                          variant="ghost"
-                          size="icon"
-                          className="h-8 w-8 opacity-0 group-hover:opacity-100 data-[state=open]:opacity-100"
-                        >
-                          <MoreHorizontal className="h-4 w-4" />
-                          <span className="sr-only">{t.common.actions}</span>
-                        </Button>
-                      </DropdownMenuTrigger>
-                      <DropdownMenuContent align="end">
-                        <DropdownMenuItem asChild>
-                          <Link href={`/invoices/${invoice.id}`}>
-                            <Eye className="mr-2 h-4 w-4" />
-                            {t.detail.viewDetails}
-                          </Link>
-                        </DropdownMenuItem>
+                    <div className="flex items-center gap-1">
+                      {/* 快捷预览按钮 */}
+                      <InvoicePreview
+                        invoice={invoice}
+                        trigger={
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            className="h-8 w-8 opacity-0 group-hover:opacity-100"
+                          >
+                            <Eye className="h-4 w-4" />
+                            <span className="sr-only">{t.preview?.title || '预览'}</span>
+                          </Button>
+                        }
+                      />
+                      {/* 更多操作 */}
+                      <DropdownMenu>
+                        <DropdownMenuTrigger asChild>
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            className="h-8 w-8 opacity-0 group-hover:opacity-100 data-[state=open]:opacity-100"
+                          >
+                            <MoreHorizontal className="h-4 w-4" />
+                            <span className="sr-only">{t.common.actions}</span>
+                          </Button>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent align="end">
+                          <DropdownMenuItem asChild>
+                            <Link href={`/invoices/${invoice.id}`}>
+                              <FileSearch className="mr-2 h-4 w-4" />
+                              {t.detail.viewDetails}
+                            </Link>
+                          </DropdownMenuItem>
                         <DropdownMenuItem asChild>
                           <Link href={`/invoices/${invoice.id}/edit`}>
                             <Pencil className="mr-2 h-4 w-4" />
@@ -174,8 +191,9 @@ export function InvoiceTable({ invoices, onDelete, onStatusChange }: InvoiceTabl
                           <Trash2 className="mr-2 h-4 w-4" />
                           {t.common.delete}
                         </DropdownMenuItem>
-                      </DropdownMenuContent>
-                    </DropdownMenu>
+                        </DropdownMenuContent>
+                      </DropdownMenu>
+                    </div>
                   </TableCell>
                 )}
               </TableRow>
