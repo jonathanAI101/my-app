@@ -1,6 +1,6 @@
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
-import { Github, Twitter, Mail, Linkedin } from "lucide-react";
+import { Github, Twitter, Mail, Linkedin, Phone, MapPin, MessageCircle } from "lucide-react";
 
 export default function Home() {
   return (
@@ -27,6 +27,22 @@ export default function Home() {
           Building digital products with a focus on clean code and thoughtful design.
           Currently crafting experiences at Acme Inc.
         </p>
+
+        {/* Contact Info */}
+        <div className="mt-8 flex flex-col gap-3 text-sm text-muted-foreground">
+          <div className="flex items-center gap-3">
+            <Phone className="h-4 w-4" />
+            <span>+86 138 0000 0000</span>
+          </div>
+          <div className="flex items-center gap-3">
+            <MessageCircle className="h-4 w-4" />
+            <span>WeChat: johndoe</span>
+          </div>
+          <div className="flex items-center gap-3">
+            <MapPin className="h-4 w-4" />
+            <span>Shanghai, China</span>
+          </div>
+        </div>
 
         {/* Social Links */}
         <div className="mt-8 flex items-center gap-2">
