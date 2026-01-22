@@ -4,6 +4,7 @@ import { useState, use } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { useInvoiceStore } from '@/store/invoiceStore';
+import { useI18n } from '@/i18n';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -34,6 +35,7 @@ export default function EditInvoicePage({ params }: EditInvoicePageProps) {
   const { id } = use(params);
   const router = useRouter();
   const { getInvoiceById, updateInvoice } = useInvoiceStore();
+  const { t } = useI18n();
   const invoice = getInvoiceById(id);
 
   const [clientName, setClientName] = useState(invoice?.client.name || '');
@@ -51,10 +53,10 @@ export default function EditInvoicePage({ params }: EditInvoicePageProps) {
     return (
       <div className="flex min-h-[400px] items-center justify-center">
         <div className="text-center">
-          <h2 className="text-lg font-semibold">发票未找到</h2>
-          <p className="text-muted-foreground">该发票可能已被删除</p>
+          <h2 className="text-lg font-semibold">{t.detail.notFound}</h2>
+          <p className="text-muted-foreground">{t.detail.notFoundMessage}</p>
           <Button asChild className="mt-4">
-            <Link href="/invoices">返回列表</Link>
+            <Link href="/invoices">{t.detail.backToList}</Link>
           </Button>
         </div>
       </div>
@@ -91,12 +93,12 @@ export default function EditInvoicePage({ params }: EditInvoicePageProps) {
 
   const handleSubmit = () => {
     if (!clientName || !clientEmail) {
-      alert('请填写客户名称和邮箱');
+      alert(t.form.fillClientInfo);
       return;
     }
 
     if (items.some((item) => !item.description || item.unitPrice <= 0)) {
-      alert('请完善明细项信息');
+      alert(t.form.fillItemInfo);
       return;
     }
 
@@ -125,12 +127,12 @@ export default function EditInvoicePage({ params }: EditInvoicePageProps) {
           className="mb-4 inline-flex items-center text-sm text-muted-foreground hover:text-foreground"
         >
           <ArrowLeft className="mr-1 h-4 w-4" />
-          返回发票详情
+          {t.form.backToDetail}
         </Link>
         <h1 className="text-2xl font-bold tracking-tight">
-          编辑发票 {invoice.invoiceNumber}
+          {t.form.editTitle} {invoice.invoiceNumber}
         </h1>
-        <p className="text-muted-foreground">修改发票信息</p>
+        <p className="text-muted-foreground">{t.form.editSubtitle}</p>
       </div>
 
       <div className="grid gap-8 lg:grid-cols-3">
@@ -138,34 +140,34 @@ export default function EditInvoicePage({ params }: EditInvoicePageProps) {
         <div className="space-y-6 lg:col-span-2">
           {/* Client Info */}
           <Card className="p-6">
-            <h2 className="mb-4 font-semibold">客户信息</h2>
+            <h2 className="mb-4 font-semibold">{t.form.clientInfo}</h2>
             <div className="grid gap-4 sm:grid-cols-2">
               <div className="space-y-2">
-                <Label htmlFor="clientName">客户名称 *</Label>
+                <Label htmlFor="clientName">{t.form.clientName} *</Label>
                 <Input
                   id="clientName"
                   value={clientName}
                   onChange={(e) => setClientName(e.target.value)}
-                  placeholder="公司或个人名称"
+                  placeholder={t.form.clientNamePlaceholder}
                 />
               </div>
               <div className="space-y-2">
-                <Label htmlFor="clientEmail">邮箱 *</Label>
+                <Label htmlFor="clientEmail">{t.form.email} *</Label>
                 <Input
                   id="clientEmail"
                   type="email"
                   value={clientEmail}
                   onChange={(e) => setClientEmail(e.target.value)}
-                  placeholder="finance@example.com"
+                  placeholder={t.form.emailPlaceholder}
                 />
               </div>
               <div className="space-y-2 sm:col-span-2">
-                <Label htmlFor="clientAddress">地址</Label>
+                <Label htmlFor="clientAddress">{t.form.address}</Label>
                 <Input
                   id="clientAddress"
                   value={clientAddress}
                   onChange={(e) => setClientAddress(e.target.value)}
-                  placeholder="详细地址（选填）"
+                  placeholder={t.form.addressPlaceholder}
                 />
               </div>
             </div>
@@ -173,10 +175,10 @@ export default function EditInvoicePage({ params }: EditInvoicePageProps) {
 
           {/* Invoice Info */}
           <Card className="p-6">
-            <h2 className="mb-4 font-semibold">发票信息</h2>
+            <h2 className="mb-4 font-semibold">{t.form.invoiceInfo}</h2>
             <div className="grid gap-4 sm:grid-cols-2">
               <div className="space-y-2">
-                <Label htmlFor="issueDate">开票日期</Label>
+                <Label htmlFor="issueDate">{t.invoices.issueDate}</Label>
                 <Input
                   id="issueDate"
                   type="date"
@@ -185,7 +187,7 @@ export default function EditInvoicePage({ params }: EditInvoicePageProps) {
                 />
               </div>
               <div className="space-y-2">
-                <Label htmlFor="dueDate">到期日期</Label>
+                <Label htmlFor="dueDate">{t.invoices.dueDate}</Label>
                 <Input
                   id="dueDate"
                   type="date"
@@ -198,14 +200,14 @@ export default function EditInvoicePage({ params }: EditInvoicePageProps) {
 
           {/* Line Items */}
           <Card className="p-6">
-            <h2 className="mb-4 font-semibold">明细项</h2>
+            <h2 className="mb-4 font-semibold">{t.form.lineItems}</h2>
             <div className="space-y-4">
               {/* Header */}
               <div className="hidden grid-cols-12 gap-4 text-sm font-medium text-muted-foreground sm:grid">
-                <div className="col-span-5">描述</div>
-                <div className="col-span-2">数量</div>
-                <div className="col-span-2">单价（元）</div>
-                <div className="col-span-2 text-right">小计</div>
+                <div className="col-span-5">{t.form.description}</div>
+                <div className="col-span-2">{t.form.quantity}</div>
+                <div className="col-span-2">{t.form.unitPrice}</div>
+                <div className="col-span-2 text-right">{t.form.subtotalItem}</div>
                 <div className="col-span-1"></div>
               </div>
 
@@ -214,7 +216,7 @@ export default function EditInvoicePage({ params }: EditInvoicePageProps) {
                 <div key={item.id} className="grid grid-cols-12 gap-4">
                   <div className="col-span-12 sm:col-span-5">
                     <Input
-                      placeholder="服务描述"
+                      placeholder={t.form.descriptionPlaceholder}
                       value={item.description}
                       onChange={(e) =>
                         updateItem(item.id, 'description', e.target.value)
@@ -272,16 +274,16 @@ export default function EditInvoicePage({ params }: EditInvoicePageProps) {
                 className="mt-2"
               >
                 <Plus className="mr-2 h-4 w-4" />
-                添加明细
+                {t.form.addItem}
               </Button>
             </div>
           </Card>
 
           {/* Notes */}
           <Card className="p-6">
-            <h2 className="mb-4 font-semibold">备注</h2>
+            <h2 className="mb-4 font-semibold">{t.form.notes}</h2>
             <Textarea
-              placeholder="添加备注信息（选填）"
+              placeholder={t.form.notesPlaceholder}
               value={notes}
               onChange={(e) => setNotes(e.target.value)}
               rows={3}
@@ -292,16 +294,16 @@ export default function EditInvoicePage({ params }: EditInvoicePageProps) {
         {/* Summary */}
         <div className="lg:col-span-1">
           <Card className="sticky top-8 p-6">
-            <h2 className="mb-4 font-semibold">金额汇总</h2>
+            <h2 className="mb-4 font-semibold">{t.form.summary}</h2>
 
             <div className="space-y-3">
               <div className="flex justify-between text-sm">
-                <span className="text-muted-foreground">小计</span>
+                <span className="text-muted-foreground">{t.form.subtotal}</span>
                 <span>{formatCurrency(subtotal)}</span>
               </div>
 
               <div className="flex items-center justify-between gap-4 text-sm">
-                <span className="text-muted-foreground">税率</span>
+                <span className="text-muted-foreground">{t.form.taxRate}</span>
                 <Select value={taxRate} onValueChange={setTaxRate}>
                   <SelectTrigger className="w-24">
                     <SelectValue />
@@ -317,13 +319,13 @@ export default function EditInvoicePage({ params }: EditInvoicePageProps) {
               </div>
 
               <div className="flex justify-between text-sm">
-                <span className="text-muted-foreground">税额</span>
+                <span className="text-muted-foreground">{t.form.taxAmount}</span>
                 <span>{formatCurrency(taxAmount)}</span>
               </div>
 
               <div className="border-t pt-3">
                 <div className="flex justify-between text-lg font-bold">
-                  <span>总计</span>
+                  <span>{t.form.total}</span>
                   <span>{formatCurrency(total)}</span>
                 </div>
               </div>
@@ -331,10 +333,10 @@ export default function EditInvoicePage({ params }: EditInvoicePageProps) {
 
             <div className="mt-6 space-y-2">
               <Button className="w-full" onClick={handleSubmit}>
-                保存修改
+                {t.form.saveChanges}
               </Button>
               <Button variant="outline" className="w-full" asChild>
-                <Link href={`/invoices/${invoice.id}`}>取消</Link>
+                <Link href={`/invoices/${invoice.id}`}>{t.common.cancel}</Link>
               </Button>
             </div>
           </Card>

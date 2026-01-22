@@ -18,6 +18,7 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import { InvoiceStatusBadge } from './InvoiceStatusBadge';
+import { useI18n } from '@/i18n';
 import { formatCurrency, formatDate } from '@/utils/format';
 import type { Invoice } from '@/types/invoice';
 import { MoreHorizontal, Eye, Pencil, Trash2, CheckCircle, XCircle } from 'lucide-react';
@@ -29,25 +30,27 @@ interface InvoiceTableProps {
 }
 
 export function InvoiceTable({ invoices, onDelete, onStatusChange }: InvoiceTableProps) {
+  const { t } = useI18n();
+
   return (
     <div className="rounded-lg border bg-card">
       <Table>
         <TableHeader>
           <TableRow className="hover:bg-transparent">
-            <TableHead className="w-[140px]">发票号</TableHead>
-            <TableHead>客户</TableHead>
-            <TableHead className="text-right">金额</TableHead>
-            <TableHead>开票日期</TableHead>
-            <TableHead>到期日期</TableHead>
-            <TableHead>状态</TableHead>
-            <TableHead className="w-[70px]">操作</TableHead>
+            <TableHead className="w-[140px]">{t.invoices.invoiceNumber}</TableHead>
+            <TableHead>{t.invoices.client}</TableHead>
+            <TableHead className="text-right">{t.invoices.amount}</TableHead>
+            <TableHead>{t.invoices.issueDate}</TableHead>
+            <TableHead>{t.invoices.dueDate}</TableHead>
+            <TableHead>{t.invoices.status}</TableHead>
+            <TableHead className="w-[70px]">{t.common.actions}</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
           {invoices.length === 0 ? (
             <TableRow>
               <TableCell colSpan={7} className="h-24 text-center text-muted-foreground">
-                暂无发票数据
+                {t.invoices.noInvoices}
               </TableCell>
             </TableRow>
           ) : (
@@ -90,20 +93,20 @@ export function InvoiceTable({ invoices, onDelete, onStatusChange }: InvoiceTabl
                         className="h-8 w-8 opacity-0 group-hover:opacity-100 data-[state=open]:opacity-100"
                       >
                         <MoreHorizontal className="h-4 w-4" />
-                        <span className="sr-only">操作菜单</span>
+                        <span className="sr-only">{t.common.actions}</span>
                       </Button>
                     </DropdownMenuTrigger>
                     <DropdownMenuContent align="end">
                       <DropdownMenuItem asChild>
                         <Link href={`/invoices/${invoice.id}`}>
                           <Eye className="mr-2 h-4 w-4" />
-                          查看详情
+                          {t.detail.viewDetails}
                         </Link>
                       </DropdownMenuItem>
                       <DropdownMenuItem asChild>
                         <Link href={`/invoices/${invoice.id}/edit`}>
                           <Pencil className="mr-2 h-4 w-4" />
-                          编辑
+                          {t.common.edit}
                         </Link>
                       </DropdownMenuItem>
                       <DropdownMenuSeparator />
@@ -112,7 +115,7 @@ export function InvoiceTable({ invoices, onDelete, onStatusChange }: InvoiceTabl
                           onClick={() => onStatusChange?.(invoice.id, 'paid')}
                         >
                           <CheckCircle className="mr-2 h-4 w-4 text-green-600" />
-                          标记为已付款
+                          {t.detail.markPaid}
                         </DropdownMenuItem>
                       )}
                       {invoice.status !== 'cancelled' && (
@@ -120,7 +123,7 @@ export function InvoiceTable({ invoices, onDelete, onStatusChange }: InvoiceTabl
                           onClick={() => onStatusChange?.(invoice.id, 'cancelled')}
                         >
                           <XCircle className="mr-2 h-4 w-4 text-gray-500" />
-                          取消发票
+                          {t.detail.cancelInvoice}
                         </DropdownMenuItem>
                       )}
                       <DropdownMenuSeparator />
@@ -129,7 +132,7 @@ export function InvoiceTable({ invoices, onDelete, onStatusChange }: InvoiceTabl
                         onClick={() => onDelete?.(invoice.id)}
                       >
                         <Trash2 className="mr-2 h-4 w-4" />
-                        删除
+                        {t.common.delete}
                       </DropdownMenuItem>
                     </DropdownMenuContent>
                   </DropdownMenu>

@@ -4,6 +4,7 @@ import { use } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useInvoiceStore } from '@/store/invoiceStore';
+import { useI18n } from '@/i18n';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { InvoiceStatusBadge } from '@/components/invoice/InvoiceStatusBadge';
@@ -25,16 +26,17 @@ export default function InvoiceDetailPage({ params }: InvoiceDetailPageProps) {
   const { id } = use(params);
   const router = useRouter();
   const { getInvoiceById, updateStatus, deleteInvoice } = useInvoiceStore();
+  const { t } = useI18n();
   const invoice = getInvoiceById(id);
 
   if (!invoice) {
     return (
       <div className="flex min-h-[400px] items-center justify-center">
         <div className="text-center">
-          <h2 className="text-lg font-semibold">发票未找到</h2>
-          <p className="text-muted-foreground">该发票可能已被删除</p>
+          <h2 className="text-lg font-semibold">{t.detail.notFound}</h2>
+          <p className="text-muted-foreground">{t.detail.notFoundMessage}</p>
           <Button asChild className="mt-4">
-            <Link href="/invoices">返回列表</Link>
+            <Link href="/invoices">{t.detail.backToList}</Link>
           </Button>
         </div>
       </div>
@@ -42,7 +44,7 @@ export default function InvoiceDetailPage({ params }: InvoiceDetailPageProps) {
   }
 
   const handleDelete = () => {
-    if (confirm('确定要删除这张发票吗？此操作不可撤销。')) {
+    if (confirm(t.detail.confirmDelete)) {
       deleteInvoice(invoice.id);
       router.push('/invoices');
     }
@@ -53,7 +55,7 @@ export default function InvoiceDetailPage({ params }: InvoiceDetailPageProps) {
   };
 
   const handleCancel = () => {
-    if (confirm('确定要取消这张发票吗？')) {
+    if (confirm(t.detail.confirmCancel)) {
       updateStatus(invoice.id, 'cancelled');
     }
   };
@@ -67,7 +69,7 @@ export default function InvoiceDetailPage({ params }: InvoiceDetailPageProps) {
           className="mb-4 inline-flex items-center text-sm text-muted-foreground hover:text-foreground"
         >
           <ArrowLeft className="mr-1 h-4 w-4" />
-          返回发票列表
+          {t.form.backToList}
         </Link>
 
         <div className="flex flex-wrap items-start justify-between gap-4">
@@ -79,7 +81,7 @@ export default function InvoiceDetailPage({ params }: InvoiceDetailPageProps) {
               <InvoiceStatusBadge status={invoice.status} />
             </div>
             <p className="text-muted-foreground">
-              创建于 {formatDate(invoice.createdAt)}
+              {t.detail.createdAt} {formatDate(invoice.createdAt)}
             </p>
           </div>
 
@@ -87,28 +89,28 @@ export default function InvoiceDetailPage({ params }: InvoiceDetailPageProps) {
             {invoice.status !== 'paid' && invoice.status !== 'cancelled' && (
               <Button onClick={handleMarkPaid}>
                 <CheckCircle className="mr-2 h-4 w-4" />
-                标记已付款
+                {t.detail.markPaid}
               </Button>
             )}
             <Button variant="outline" asChild>
               <Link href={`/invoices/${invoice.id}/edit`}>
                 <Pencil className="mr-2 h-4 w-4" />
-                编辑
+                {t.common.edit}
               </Link>
             </Button>
             {invoice.status !== 'cancelled' && (
               <Button variant="outline" onClick={handleCancel}>
                 <XCircle className="mr-2 h-4 w-4" />
-                取消
+                {t.detail.cancelInvoice}
               </Button>
             )}
             <Button variant="outline" onClick={() => window.print()}>
               <Printer className="mr-2 h-4 w-4" />
-              打印
+              {t.detail.print}
             </Button>
             <Button variant="destructive" onClick={handleDelete}>
               <Trash2 className="mr-2 h-4 w-4" />
-              删除
+              {t.common.delete}
             </Button>
           </div>
         </div>
@@ -119,20 +121,20 @@ export default function InvoiceDetailPage({ params }: InvoiceDetailPageProps) {
         {/* Header */}
         <div className="mb-8 flex justify-between">
           <div>
-            <h2 className="text-xl font-bold text-primary">Meta Inc.</h2>
-            <p className="text-sm text-muted-foreground">内部发票管理系统</p>
+            <h2 className="text-xl font-bold text-primary">{t.detail.companyName}</h2>
+            <p className="text-sm text-muted-foreground">{t.detail.companySubtitle}</p>
           </div>
           <div className="text-right">
             <p className="text-2xl font-bold">{invoice.invoiceNumber}</p>
             <p className="text-sm text-muted-foreground">
-              开票日期: {formatDate(invoice.issueDate)}
+              {t.invoices.issueDate}: {formatDate(invoice.issueDate)}
             </p>
             <p className="text-sm text-muted-foreground">
-              到期日期: {formatDate(invoice.dueDate)}
+              {t.invoices.dueDate}: {formatDate(invoice.dueDate)}
             </p>
             {invoice.paidDate && (
               <p className="text-sm text-green-600">
-                付款日期: {formatDate(invoice.paidDate)}
+                {t.invoices.paidDate}: {formatDate(invoice.paidDate)}
               </p>
             )}
           </div>
@@ -140,7 +142,7 @@ export default function InvoiceDetailPage({ params }: InvoiceDetailPageProps) {
 
         {/* Client Info */}
         <div className="mb-8 rounded-lg bg-muted p-4">
-          <p className="text-sm font-medium text-muted-foreground">客户信息</p>
+          <p className="text-sm font-medium text-muted-foreground">{t.form.clientInfo}</p>
           <p className="mt-1 font-semibold">{invoice.client.name}</p>
           <p className="text-sm text-muted-foreground">{invoice.client.email}</p>
           {invoice.client.address && (
@@ -155,10 +157,10 @@ export default function InvoiceDetailPage({ params }: InvoiceDetailPageProps) {
           <table className="w-full">
             <thead>
               <tr className="border-b text-left text-sm font-medium text-muted-foreground">
-                <th className="pb-3">描述</th>
-                <th className="pb-3 text-right">数量</th>
-                <th className="pb-3 text-right">单价</th>
-                <th className="pb-3 text-right">小计</th>
+                <th className="pb-3">{t.form.description}</th>
+                <th className="pb-3 text-right">{t.form.quantity}</th>
+                <th className="pb-3 text-right">{t.form.unitPrice}</th>
+                <th className="pb-3 text-right">{t.form.subtotalItem}</th>
               </tr>
             </thead>
             <tbody>
@@ -184,21 +186,21 @@ export default function InvoiceDetailPage({ params }: InvoiceDetailPageProps) {
         <div className="flex justify-end">
           <div className="w-64 space-y-2">
             <div className="flex justify-between text-sm">
-              <span className="text-muted-foreground">小计</span>
+              <span className="text-muted-foreground">{t.form.subtotal}</span>
               <span className="tabular-nums">
                 {formatCurrency(invoice.subtotal)}
               </span>
             </div>
             <div className="flex justify-between text-sm">
               <span className="text-muted-foreground">
-                税额 ({(invoice.taxRate * 100).toFixed(0)}%)
+                {t.form.taxAmount} ({(invoice.taxRate * 100).toFixed(0)}%)
               </span>
               <span className="tabular-nums">
                 {formatCurrency(invoice.taxAmount)}
               </span>
             </div>
             <div className="flex justify-between border-t pt-2 text-lg font-bold">
-              <span>总计</span>
+              <span>{t.form.total}</span>
               <span className="tabular-nums">
                 {formatCurrency(invoice.total)}
               </span>
@@ -209,7 +211,7 @@ export default function InvoiceDetailPage({ params }: InvoiceDetailPageProps) {
         {/* Notes */}
         {invoice.notes && (
           <div className="mt-8 rounded-lg bg-muted p-4">
-            <p className="text-sm font-medium text-muted-foreground">备注</p>
+            <p className="text-sm font-medium text-muted-foreground">{t.form.notes}</p>
             <p className="mt-1 text-sm">{invoice.notes}</p>
           </div>
         )}

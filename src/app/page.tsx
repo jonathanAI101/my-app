@@ -2,6 +2,7 @@
 
 import Link from 'next/link';
 import { useInvoiceStore } from '@/store/invoiceStore';
+import { useI18n } from '@/i18n';
 import { StatsCard } from '@/components/invoice/StatsCard';
 import { InvoiceTable } from '@/components/invoice/InvoiceTable';
 import { Button } from '@/components/ui/button';
@@ -18,6 +19,7 @@ import {
 
 export default function DashboardPage() {
   const { invoices, stats, updateStatus, deleteInvoice } = useInvoiceStore();
+  const { t, formatMessage } = useI18n();
   const invoiceStats = stats();
   const recentInvoices = invoices.slice(0, 5);
   const overdueInvoices = invoices.filter((inv) => inv.status === 'overdue');
@@ -27,13 +29,13 @@ export default function DashboardPage() {
       {/* Header */}
       <div className="mb-8 flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold tracking-tight">仪表盘</h1>
-          <p className="text-muted-foreground">欢迎回来，这是您的发票概览</p>
+          <h1 className="text-2xl font-bold tracking-tight">{t.dashboard.title}</h1>
+          <p className="text-muted-foreground">{t.dashboard.welcome}</p>
         </div>
         <Button asChild>
           <Link href="/invoices/new">
             <Plus className="mr-2 h-4 w-4" />
-            新建发票
+            {t.nav.newInvoice}
           </Link>
         </Button>
       </div>
@@ -41,30 +43,30 @@ export default function DashboardPage() {
       {/* Stats Grid */}
       <div className="mb-8 grid gap-4 md:grid-cols-2 lg:grid-cols-4">
         <StatsCard
-          title="总收入"
+          title={t.dashboard.totalRevenue}
           value={formatCurrency(invoiceStats.totalRevenue)}
-          description={`${invoiceStats.paidCount} 张已付款`}
+          description={formatMessage(t.dashboard.paidCount, { count: invoiceStats.paidCount })}
           icon={DollarSign}
           iconColor="text-green-600"
         />
         <StatsCard
-          title="待收款"
+          title={t.dashboard.pendingAmount}
           value={formatCurrency(invoiceStats.pendingAmount)}
-          description="等待客户付款"
+          description={t.dashboard.waitingPayment}
           icon={Clock}
           iconColor="text-blue-600"
         />
         <StatsCard
-          title="逾期款项"
+          title={t.dashboard.overdueAmount}
           value={formatCurrency(invoiceStats.overdueAmount)}
-          description={`${invoiceStats.overdueCount} 张已逾期`}
+          description={formatMessage(t.dashboard.overdueCount, { count: invoiceStats.overdueCount })}
           icon={AlertTriangle}
           iconColor="text-red-600"
         />
         <StatsCard
-          title="发票总数"
+          title={t.dashboard.totalInvoices}
           value={String(invoiceStats.invoiceCount)}
-          description="所有发票"
+          description={t.dashboard.allInvoices}
           icon={FileText}
           iconColor="text-gray-600"
         />
@@ -79,15 +81,17 @@ export default function DashboardPage() {
                 <AlertTriangle className="h-5 w-5 text-red-600" />
               </div>
               <div>
-                <h3 className="font-semibold text-red-900">逾期提醒</h3>
+                <h3 className="font-semibold text-red-900">{t.dashboard.overdueAlert}</h3>
                 <p className="text-sm text-red-700">
-                  您有 {overdueInvoices.length} 张发票已逾期，总金额{' '}
-                  {formatCurrency(invoiceStats.overdueAmount)}
+                  {formatMessage(t.dashboard.overdueMessage, {
+                    count: overdueInvoices.length,
+                    amount: formatCurrency(invoiceStats.overdueAmount),
+                  })}
                 </p>
               </div>
             </div>
             <Button variant="destructive" size="sm" asChild>
-              <Link href="/invoices?status=overdue">立即处理</Link>
+              <Link href="/invoices?status=overdue">{t.dashboard.handleNow}</Link>
             </Button>
           </div>
         </Card>
@@ -96,10 +100,10 @@ export default function DashboardPage() {
       {/* Recent Invoices */}
       <div className="space-y-4">
         <div className="flex items-center justify-between">
-          <h2 className="text-lg font-semibold">最近发票</h2>
+          <h2 className="text-lg font-semibold">{t.dashboard.recentInvoices}</h2>
           <Button variant="ghost" size="sm" asChild>
             <Link href="/invoices">
-              查看全部
+              {t.dashboard.viewAll}
               <ArrowRight className="ml-1 h-4 w-4" />
             </Link>
           </Button>

@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useInvoiceStore } from '@/store/invoiceStore';
+import { useI18n } from '@/i18n';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -29,6 +30,7 @@ const taxRateOptions = [
 export default function NewInvoicePage() {
   const router = useRouter();
   const { addInvoice } = useInvoiceStore();
+  const { t } = useI18n();
 
   const [clientName, setClientName] = useState('');
   const [clientEmail, setClientEmail] = useState('');
@@ -75,12 +77,12 @@ export default function NewInvoicePage() {
 
   const handleSubmit = (status: InvoiceStatus) => {
     if (!clientName || !clientEmail) {
-      alert('请填写客户名称和邮箱');
+      alert(t.form.fillClientInfo);
       return;
     }
 
     if (items.some((item) => !item.description || item.unitPrice <= 0)) {
-      alert('请完善明细项信息');
+      alert(t.form.fillItemInfo);
       return;
     }
 
@@ -110,10 +112,10 @@ export default function NewInvoicePage() {
           className="mb-4 inline-flex items-center text-sm text-muted-foreground hover:text-foreground"
         >
           <ArrowLeft className="mr-1 h-4 w-4" />
-          返回发票列表
+          {t.form.backToList}
         </Link>
-        <h1 className="text-2xl font-bold tracking-tight">新建发票</h1>
-        <p className="text-muted-foreground">创建新的发票记录</p>
+        <h1 className="text-2xl font-bold tracking-tight">{t.form.createTitle}</h1>
+        <p className="text-muted-foreground">{t.form.createSubtitle}</p>
       </div>
 
       <div className="grid gap-8 lg:grid-cols-3">
@@ -121,34 +123,34 @@ export default function NewInvoicePage() {
         <div className="space-y-6 lg:col-span-2">
           {/* Client Info */}
           <Card className="p-6">
-            <h2 className="mb-4 font-semibold">客户信息</h2>
+            <h2 className="mb-4 font-semibold">{t.form.clientInfo}</h2>
             <div className="grid gap-4 sm:grid-cols-2">
               <div className="space-y-2">
-                <Label htmlFor="clientName">客户名称 *</Label>
+                <Label htmlFor="clientName">{t.form.clientName} *</Label>
                 <Input
                   id="clientName"
                   value={clientName}
                   onChange={(e) => setClientName(e.target.value)}
-                  placeholder="公司或个人名称"
+                  placeholder={t.form.clientNamePlaceholder}
                 />
               </div>
               <div className="space-y-2">
-                <Label htmlFor="clientEmail">邮箱 *</Label>
+                <Label htmlFor="clientEmail">{t.form.email} *</Label>
                 <Input
                   id="clientEmail"
                   type="email"
                   value={clientEmail}
                   onChange={(e) => setClientEmail(e.target.value)}
-                  placeholder="finance@example.com"
+                  placeholder={t.form.emailPlaceholder}
                 />
               </div>
               <div className="space-y-2 sm:col-span-2">
-                <Label htmlFor="clientAddress">地址</Label>
+                <Label htmlFor="clientAddress">{t.form.address}</Label>
                 <Input
                   id="clientAddress"
                   value={clientAddress}
                   onChange={(e) => setClientAddress(e.target.value)}
-                  placeholder="详细地址（选填）"
+                  placeholder={t.form.addressPlaceholder}
                 />
               </div>
             </div>
@@ -156,10 +158,10 @@ export default function NewInvoicePage() {
 
           {/* Invoice Info */}
           <Card className="p-6">
-            <h2 className="mb-4 font-semibold">发票信息</h2>
+            <h2 className="mb-4 font-semibold">{t.form.invoiceInfo}</h2>
             <div className="grid gap-4 sm:grid-cols-2">
               <div className="space-y-2">
-                <Label htmlFor="issueDate">开票日期</Label>
+                <Label htmlFor="issueDate">{t.invoices.issueDate}</Label>
                 <Input
                   id="issueDate"
                   type="date"
@@ -168,7 +170,7 @@ export default function NewInvoicePage() {
                 />
               </div>
               <div className="space-y-2">
-                <Label htmlFor="dueDate">到期日期</Label>
+                <Label htmlFor="dueDate">{t.invoices.dueDate}</Label>
                 <Input
                   id="dueDate"
                   type="date"
@@ -181,14 +183,14 @@ export default function NewInvoicePage() {
 
           {/* Line Items */}
           <Card className="p-6">
-            <h2 className="mb-4 font-semibold">明细项</h2>
+            <h2 className="mb-4 font-semibold">{t.form.lineItems}</h2>
             <div className="space-y-4">
               {/* Header */}
               <div className="hidden grid-cols-12 gap-4 text-sm font-medium text-muted-foreground sm:grid">
-                <div className="col-span-5">描述</div>
-                <div className="col-span-2">数量</div>
-                <div className="col-span-2">单价（元）</div>
-                <div className="col-span-2 text-right">小计</div>
+                <div className="col-span-5">{t.form.description}</div>
+                <div className="col-span-2">{t.form.quantity}</div>
+                <div className="col-span-2">{t.form.unitPrice}</div>
+                <div className="col-span-2 text-right">{t.form.subtotalItem}</div>
                 <div className="col-span-1"></div>
               </div>
 
@@ -197,7 +199,7 @@ export default function NewInvoicePage() {
                 <div key={item.id} className="grid grid-cols-12 gap-4">
                   <div className="col-span-12 sm:col-span-5">
                     <Input
-                      placeholder="服务描述"
+                      placeholder={t.form.descriptionPlaceholder}
                       value={item.description}
                       onChange={(e) =>
                         updateItem(item.id, 'description', e.target.value)
@@ -255,16 +257,16 @@ export default function NewInvoicePage() {
                 className="mt-2"
               >
                 <Plus className="mr-2 h-4 w-4" />
-                添加明细
+                {t.form.addItem}
               </Button>
             </div>
           </Card>
 
           {/* Notes */}
           <Card className="p-6">
-            <h2 className="mb-4 font-semibold">备注</h2>
+            <h2 className="mb-4 font-semibold">{t.form.notes}</h2>
             <Textarea
-              placeholder="添加备注信息（选填）"
+              placeholder={t.form.notesPlaceholder}
               value={notes}
               onChange={(e) => setNotes(e.target.value)}
               rows={3}
@@ -275,16 +277,16 @@ export default function NewInvoicePage() {
         {/* Summary */}
         <div className="lg:col-span-1">
           <Card className="sticky top-8 p-6">
-            <h2 className="mb-4 font-semibold">金额汇总</h2>
+            <h2 className="mb-4 font-semibold">{t.form.summary}</h2>
 
             <div className="space-y-3">
               <div className="flex justify-between text-sm">
-                <span className="text-muted-foreground">小计</span>
+                <span className="text-muted-foreground">{t.form.subtotal}</span>
                 <span>{formatCurrency(subtotal)}</span>
               </div>
 
               <div className="flex items-center justify-between gap-4 text-sm">
-                <span className="text-muted-foreground">税率</span>
+                <span className="text-muted-foreground">{t.form.taxRate}</span>
                 <Select value={taxRate} onValueChange={setTaxRate}>
                   <SelectTrigger className="w-24">
                     <SelectValue />
@@ -300,13 +302,13 @@ export default function NewInvoicePage() {
               </div>
 
               <div className="flex justify-between text-sm">
-                <span className="text-muted-foreground">税额</span>
+                <span className="text-muted-foreground">{t.form.taxAmount}</span>
                 <span>{formatCurrency(taxAmount)}</span>
               </div>
 
               <div className="border-t pt-3">
                 <div className="flex justify-between text-lg font-bold">
-                  <span>总计</span>
+                  <span>{t.form.total}</span>
                   <span>{formatCurrency(total)}</span>
                 </div>
               </div>
@@ -317,14 +319,14 @@ export default function NewInvoicePage() {
                 className="w-full"
                 onClick={() => handleSubmit('pending')}
               >
-                创建发票
+                {t.form.createInvoice}
               </Button>
               <Button
                 variant="outline"
                 className="w-full"
                 onClick={() => handleSubmit('draft')}
               >
-                保存草稿
+                {t.form.saveDraft}
               </Button>
             </div>
           </Card>
