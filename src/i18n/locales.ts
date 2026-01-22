@@ -15,6 +15,7 @@ export const locales = {
       noData: '暂无数据',
       confirm: '确认',
       all: '全部',
+      reset: '重置',
     },
 
     // Navigation
@@ -61,6 +62,9 @@ export const locales = {
       pagination: '共 {total} 条，第 {current}/{pages} 页',
       prevPage: '上一页',
       nextPage: '下一页',
+      date: '日期',
+      perPage: '条/页',
+      columns: '显示列',
     },
 
     // Invoice Status
@@ -144,6 +148,19 @@ export const locales = {
       internalTool: '内部工具',
     },
 
+    // Export
+    export: {
+      title: '导出',
+      exportAs: '导出为',
+      excel: 'Excel',
+      report: '文本报表',
+      importJSON: '导入 JSON',
+      importSuccess: '导入成功',
+      invoicesImported: '条发票已导入',
+      skipped: '条重复数据已跳过',
+      importError: '导入失败',
+    },
+
     // Language
     language: {
       zh: '中文',
@@ -168,6 +185,7 @@ export const locales = {
       noData: 'No data',
       confirm: 'Confirm',
       all: 'All',
+      reset: 'Reset',
     },
 
     // Navigation
@@ -214,6 +232,9 @@ export const locales = {
       pagination: 'Total {total}, Page {current}/{pages}',
       prevPage: 'Previous',
       nextPage: 'Next',
+      date: 'Date',
+      perPage: 'per page',
+      columns: 'Columns',
     },
 
     // Invoice Status
@@ -297,6 +318,19 @@ export const locales = {
       internalTool: 'Internal Tool',
     },
 
+    // Export
+    export: {
+      title: 'Export',
+      exportAs: 'Export as',
+      excel: 'Excel',
+      report: 'Text Report',
+      importJSON: 'Import JSON',
+      importSuccess: 'Import successful',
+      invoicesImported: 'invoices imported',
+      skipped: 'duplicates skipped',
+      importError: 'Import failed',
+    },
+
     // Language
     language: {
       zh: '中文',
@@ -307,4 +341,4 @@ export const locales = {
 } as const;
 
 export type Locale = keyof typeof locales;
-export type Translations = typeof locales.zh;
+export type Translations = (typeof locales)[Locale];
